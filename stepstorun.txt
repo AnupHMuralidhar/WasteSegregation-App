@@ -1,0 +1,50 @@
+# How to Run the AI Waste Segregation App
+
+## Prerequisites
+Before running the app, make sure you have the following installed:
+
+- Python 3.7 or higher
+- Streamlit library
+- pydeck library (for the map visualization)
+- Any other dependencies you may have used in your `app.py`
+
+## Installation
+
+1. Clone the repository to your local machine:
+   
+   git clone https://github.com/AnupHMuralidhar/WasteSegregation.git
+   
+
+2. Navigate to the project directory:
+   
+   cd <project_directory>
+  
+
+3. Install the required Python dependencies:
+ 
+   pip install -r requirements.txt
+  
+
+## Running the App
+
+1. Open a terminal/command prompt in the project directory.
+
+2. Run the following command to start the app:
+   
+   streamlit run info.py
+   
+
+3. The app should now be running locally. You can access it through your browser at:
+   
+   http://localhost:8501
+
+4. Also run another app:
+
+    streamlit run app.py
+
+5. The app should now be running locally:
+   
+   http://localhost:8502
+   Do not open this app in a separate webpage.
+   
+6. View the Landfill page and the Link at the end of the page will auto redirect to Waste Classification page.
