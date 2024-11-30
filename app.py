@@ -44,21 +44,24 @@ uploaded_files = st.sidebar.file_uploader(
 )
 
 # Add a simplified message below the file uploader
-st.sidebar.write("Please upload images from the categories shown on the right or center of the screen.")
+st.sidebar.write("Please upload images from the categories shown on the screen.")
 
 # Create a dictionary to store images for each category
 category_images = {category: [] for category in categories}
 
-# Process uploaded images
+# Process uploaded images only if files are provided
 if uploaded_files:
     st.write(f"Number of images uploaded: {len(uploaded_files)}")
 
     for uploaded_file in uploaded_files:
-        img = Image.open(uploaded_file)
-        category, confidence = predict_category(img)
+        try:
+            img = Image.open(uploaded_file)
+            category, confidence = predict_category(img)
 
-        # Append the image to the respective category list
-        category_images[category].append((img, uploaded_file.name, confidence))
+            # Append the image to the respective category list
+            category_images[category].append((img, uploaded_file.name, confidence))
+        except Exception as e:
+            st.error(f"Error processing file {uploaded_file.name}: {e}")
 
 # Initialize session state to track the visibility of category images
 if 'selected_categories' not in st.session_state:
