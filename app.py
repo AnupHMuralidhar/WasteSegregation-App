@@ -21,13 +21,18 @@ def predict_category(img):
     class_idx = np.argmax(prediction, axis=1)  # Get the index of the predicted class
     class_labels = ['battery', 'biological', 'brownglass', 'cardboard', 'clothes', 
                     'greenglass', 'metal', 'paper', 'plastic', 'shoes', 'trash', 'whiteglass']
-    return class_labels[class_idx[0]], prediction[0][class_idx[0]]
+    confidence = prediction[0][class_idx[0]]
+    
+    # Set a confidence threshold for "Unknown" predictions
+    if confidence < 0.5:  # Adjust threshold as needed
+        return "Unknown", confidence
+    return class_labels[class_idx[0]], confidence
 
 # Create a list of categories and corresponding colors
 categories = ['battery', 'biological', 'brownglass', 'cardboard', 'clothes', 
-              'greenglass', 'metal', 'paper', 'plastic', 'shoes', 'trash', 'whiteglass']
+              'greenglass', 'metal', 'paper', 'plastic', 'shoes', 'trash', 'whiteglass', 'Unknown']
 category_colors = ['red', 'green', 'blue', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 
-                   'brown', 'pink', 'gray', 'lightblue']
+                   'brown', 'pink', 'gray', 'lightblue', 'black']
 
 # Streamlit UI setup
 st.set_page_config(page_title="Waste Classification Demo", page_icon=":recycle:", layout="wide")
@@ -77,4 +82,7 @@ for category, color in zip(categories, category_colors):
                 for img, name, confidence in images_for_category:
                     st.image(img, caption=f"{name} - Confidence: {confidence:.2f}", use_column_width=True)
             else:
-                st.write(f"No images for {category} category.")
+                if category == "Unknown":
+                    st.warning("These images do not match any of the known waste categories. Please upload images of waste typically found in landfills.")
+                else:
+                    st.write(f"No images for {category} category.")
