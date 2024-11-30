@@ -75,6 +75,6 @@ for category, color in zip(categories, category_colors):
             
             if images_for_category:
                 for img, name, confidence in images_for_category:
-                    st.image(img, caption=f"{name} - Confidence: {confidence:.2f}", use_container_width=True)
+                    st.image(img, caption=f"{name} - Confidence: {confidence:.2f}", use_column_width=True)
             else:
                 st.write(f"No images for {category} category.")
