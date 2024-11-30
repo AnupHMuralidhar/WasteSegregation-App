@@ -26,33 +26,69 @@ def predict_category(img):
                     'greenglass', 'metal', 'paper', 'plastic', 'shoes', 'trash', 'whiteglass']
     return class_labels[class_idx[0]], prediction[0][class_idx[0]]
 
+# Categories and corresponding colors
+categories = ['battery', 'biological', 'brownglass', 'cardboard', 'clothes', 
+              'greenglass', 'metal', 'paper', 'plastic', 'shoes', 'trash', 'whiteglass']
+category_colors = ['red', 'green', 'blue', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 
+                   'brown', 'pink', 'gray', 'lightblue']
+
 # Streamlit UI setup
 st.title("Waste Classification Demo with our Trained AI Model")
 
-# Sidebar: Upload Images
+# Add message below the file uploader
+st.write("Please upload pictures for the following categories:")
+st.write(", ".join([category.capitalize() for category in categories]))
+
+# Sidebar: File uploader for multiple images
 st.sidebar.header("Upload Images")
-uploaded_file = st.sidebar.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
+uploaded_files = st.sidebar.file_uploader(
+    "Choose image files (you can upload multiple images)", 
+    type=["jpg", "jpeg", "png"], 
+    accept_multiple_files=True
+)
 
-# Add a message below the file uploader
-st.sidebar.write("Please upload pictures for the following categories:")
-categories = ['battery', 'biological', 'brownglass', 'cardboard', 'clothes', 
-              'greenglass', 'metal', 'paper', 'plastic', 'shoes', 'trash', 'whiteglass']
-st.sidebar.write(", ".join([category.capitalize() for category in categories]))
+# Create a dictionary to store images for each category
+category_images = {category: [] for category in categories}
 
-# Show preview and confirmation for a single uploaded file
-if uploaded_file is not None:
-    img = Image.open(uploaded_file)
+# Process uploaded images
+if uploaded_files:
+    st.write(f"Number of images uploaded: {len(uploaded_files)}")
 
-    # Display preview of the uploaded image
-    st.image(img, caption="Preview of the uploaded image", use_container_width=True)
-
-    # Add a confirmation button
-    if st.button("Confirm Upload"):
-        # Predict the category after confirmation
+    for uploaded_file in uploaded_files:
+        img = Image.open(uploaded_file)
         category, confidence = predict_category(img)
 
-        # Display prediction result
-        st.success(f"Predicted Category: {category.capitalize()}")
-        st.write(f"Confidence: {confidence:.2f}")
-    else:
-        st.warning("Please confirm the upload to proceed.")
+        # Append the image to the respective category list
+        category_images[category].append((img, uploaded_file.name, confidence))
+
+# Initialize session state to track the visibility of category images
+if 'selected_categories' not in st.session_state:
+    st.session_state.selected_categories = {category: False for category in categories}
+
+# Create a container to display the categories as cards
+category_cards = st.container()
+
+# Display categories as cards and images below them
+for category, color in zip(categories, category_colors):
+    with category_cards:
+        # Card UI for each category
+        card = st.button(
+            f"View {category.capitalize()} Images", 
+            key=category, 
+            help=f"Click to view {category} images"
+        )
+
+        if card:
+            # Toggle the visibility of images for the selected category
+            st.session_state.selected_categories[category] = not st.session_state.selected_categories[category]
+        
+        # Show images if the category is selected
+        if st.session_state.selected_categories[category]:
+            st.subheader(f"Images of {category.capitalize()} Category")
+            images_for_category = category_images[category]
+            
+            if images_for_category:
+                for img, name, confidence in images_for_category:
+                    st.image(img, caption=f"{name} - Confidence: {confidence:.2f}", use_container_width=True)
+            else:
+                st.write(f"No images for {category} category.")
