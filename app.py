@@ -35,10 +35,6 @@ category_colors = ['red', 'green', 'blue', 'orange', 'purple', 'cyan', 'magenta'
 # Streamlit UI setup
 st.title("Waste Classification Demo with our Trained AI Model")
 
-# Add message below the file uploader
-st.write("Please upload pictures for the following categories:")
-st.write(", ".join([category.capitalize() for category in categories]))
-
 # Sidebar: File uploader for multiple images
 st.sidebar.header("Upload Images")
 uploaded_files = st.sidebar.file_uploader(
@@ -46,6 +42,9 @@ uploaded_files = st.sidebar.file_uploader(
     type=["jpg", "jpeg", "png"], 
     accept_multiple_files=True
 )
+
+# Add a simplified message below the file uploader
+st.sidebar.write("Please upload images from the categories shown on the right or center of the screen.")
 
 # Create a dictionary to store images for each category
 category_images = {category: [] for category in categories}
