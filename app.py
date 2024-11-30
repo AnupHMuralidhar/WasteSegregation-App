@@ -3,9 +3,6 @@ import numpy as np
 from PIL import Image
 from tensorflow.keras.models import load_model
 
-# Set the page configuration
-st.set_page_config(page_title="Waste Classification Demo", page_icon=":recycle:", layout="wide")
-
 # Load the trained model
 model = load_model('waste_model.h5')
 
@@ -26,42 +23,36 @@ def predict_category(img):
                     'greenglass', 'metal', 'paper', 'plastic', 'shoes', 'trash', 'whiteglass']
     return class_labels[class_idx[0]], prediction[0][class_idx[0]]
 
-# Categories and corresponding colors
+# Create a list of categories and corresponding colors
 categories = ['battery', 'biological', 'brownglass', 'cardboard', 'clothes', 
               'greenglass', 'metal', 'paper', 'plastic', 'shoes', 'trash', 'whiteglass']
 category_colors = ['red', 'green', 'blue', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 
                    'brown', 'pink', 'gray', 'lightblue']
 
 # Streamlit UI setup
+st.set_page_config(page_title="Waste Classification Demo", page_icon=":recycle:", layout="wide")
 st.title("Waste Classification Demo with our Trained AI Model")
 
-# Sidebar: File uploader for multiple images
+# Add file uploader on the left
 st.sidebar.header("Upload Images")
-uploaded_files = st.sidebar.file_uploader(
-    "Choose image files (you can upload multiple images)", 
-    type=["jpg", "jpeg", "png"], 
-    accept_multiple_files=True
-)
+uploaded_files = st.sidebar.file_uploader("Choose files", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
-# Add a simplified message below the file uploader
-st.sidebar.write("Please upload images from the categories shown on the screen.")
+# Add a message below the uploader
+st.sidebar.write("Please upload images from the categories seen on the screen.")
 
 # Create a dictionary to store images for each category
 category_images = {category: [] for category in categories}
 
-# Process uploaded images only if files are provided
-if uploaded_files:
+# Loop over the uploaded files and categorize them
+if uploaded_files is not None:
     st.write(f"Number of images uploaded: {len(uploaded_files)}")
-
+    
     for uploaded_file in uploaded_files:
-        try:
-            img = Image.open(uploaded_file)
-            category, confidence = predict_category(img)
+        img = Image.open(uploaded_file)
+        category, confidence = predict_category(img)
 
-            # Append the image to the respective category list
-            category_images[category].append((img, uploaded_file.name, confidence))
-        except Exception as e:
-            st.error(f"Error processing file {uploaded_file.name}: {e}")
+        # Append the image to the respective category list
+        category_images[category].append((img, uploaded_file.name, confidence))
 
 # Initialize session state to track the visibility of category images
 if 'selected_categories' not in st.session_state:
@@ -74,11 +65,7 @@ category_cards = st.container()
 for category, color in zip(categories, category_colors):
     with category_cards:
         # Card UI for each category
-        card = st.button(
-            f"View {category.capitalize()} Images", 
-            key=category, 
-            help=f"Click to view {category} images"
-        )
+        card = st.button(f"View {category.capitalize()} Images", key=category, help=f"Click to view {category} images")
 
         if card:
             # Toggle the visibility of images for the selected category
